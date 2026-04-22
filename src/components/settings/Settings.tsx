@@ -6,11 +6,20 @@ import About from '../About.tsx';
 import AutostartForm from './forms/AutostartForm.tsx';
 import CalendarForm from './forms/CalendarForm.tsx';
 import MacosTrayTitleSettings from './forms/MacosTrayTitleSettings.tsx';
+import PersonalDataForm from './forms/PersonalDataForm.tsx';
 import TransparentEffectForm from './forms/TransparentEffectForm.tsx';
+import WebDAVForm from './forms/WebDAVForm.tsx';
 import WidgetShowForm from './forms/WidgetShowForm.tsx';
 import WindowsTrayForm from './forms/WindowsTrayForm.tsx';
 
-type SettingsTab = 'general' | 'calendar' | 'trayClock' | 'trayTitle' | 'about';
+type SettingsTab =
+  | 'general'
+  | 'calendar'
+  | 'personal'
+  | 'webdav'
+  | 'trayClock'
+  | 'trayTitle'
+  | 'about';
 
 interface SettingsPageProps {
   /** 移动端精简模式下，只保留“日历内容”配置。 */
@@ -34,6 +43,8 @@ const Settings: React.FC<SettingsPageProps> = ({ mobileCalendarOnly = false }) =
     : [
         { key: 'general', label: '通用设置' },
         { key: 'calendar', label: '日历内容' },
+        { key: 'personal', label: '个人数据' },
+        { key: 'webdav', label: '数据同步' },
         ...(isWindows ? [{ key: 'trayClock', label: '任务栏时钟' }] : []),
         ...(isMacos ? [{ key: 'trayTitle', label: '菜单图标' }] : []),
         { key: 'about', label: '关于' },
@@ -52,6 +63,10 @@ const Settings: React.FC<SettingsPageProps> = ({ mobileCalendarOnly = false }) =
         );
       case 'calendar':
         return <CalendarForm />;
+      case 'personal':
+        return <PersonalDataForm />;
+      case 'webdav':
+        return <WebDAVForm />;
       case 'trayClock':
         return <WindowsTrayForm />;
       case 'trayTitle':

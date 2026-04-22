@@ -261,7 +261,6 @@ const MacosTrayTitleSettings: FC = () => {
                 <InputNumber
                   min={16}
                   max={128}
-
                   addonBefore="高"
                   style={{ width: 140 }}
                   disabled={!trayUsesDateGlyph}

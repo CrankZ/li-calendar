@@ -12,6 +12,7 @@ import type { ReactElement } from 'react';
 import { useCalendarViewContext } from '../../../hooks/calender/CalendarViewContext.tsx';
 import type { CalendarViewClassNames } from '../../../styles/useCalendarViewStyles.ts';
 import { weekdayNames } from '../../../utils/calendar/calendarFestivals.ts';
+import { WeatherDisplay } from '../../weather/WeatherDisplay.tsx';
 
 /** 供 `useCalendarViewModel` 组装的顶栏数据形状（亦可用于单测 mock） */
 export interface CalendarHeaderProps {
@@ -81,6 +82,7 @@ function CalendarHeader(): ReactElement {
           {selectedLunar.getYearShengXiao()}年
         </div>
       </div>
+      <WeatherDisplay styles={styles} />
       {/* 右侧操作区按按钮粒度控制，便于移动端与桌面端复用同一个头部组件。 */}
       {(showThemeButton || showPinButton || showSettingsButton || showCloseButton) && (
         <div className={styles.headerActions}>

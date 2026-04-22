@@ -31,7 +31,10 @@ export interface ConfigItem
   extends SystemConfig,
     CalendarFooterVisible,
     ConfigWindows,
-    ConfigMacos {}
+    ConfigMacos,
+    WeatherConfig,
+    PersonalDataConfig,
+    WebDAVConfig {}
 
 export interface SystemConfig {
   // 开机自启动
@@ -93,4 +96,66 @@ export interface ConfigMacos {
   macosTrayIconWidth: number;
   /** 菜单栏日期图标位图高度（像素），默认 36（21×18 @2×，与 tray 约 18pt 槽 + LunarBar 15pt 图高一致） */
   macosTrayIconHeight: number;
+}
+
+export interface WeatherCity {
+  id: string;
+  name: string;
+  cityCode: string;
+}
+
+export interface WeatherConfig {
+  weatherEnabled: boolean;
+  weatherApiKey: string;
+  defaultCity: WeatherCity | null;
+  additionalCities: WeatherCity[];
+}
+
+export interface TodoItem {
+  id: string;
+  content: string;
+  completed: boolean;
+  dueDate: string | null;
+  priority: 'low' | 'medium' | 'high';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ScheduleItem {
+  id: string;
+  title: string;
+  date: string;
+  startTime: string | null;
+  endTime: string | null;
+  description: string;
+  remindBefore: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BirthdayItem {
+  id: string;
+  name: string;
+  date: string;
+  isLunar: boolean;
+  remindDays: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PersonalDataConfig {
+  todos: TodoItem[];
+  schedules: ScheduleItem[];
+  birthdays: BirthdayItem[];
+  todoVisible: boolean;
+  scheduleVisible: boolean;
+  birthdayVisible: boolean;
+}
+
+export interface WebDAVConfig {
+  webdavEnabled: boolean;
+  webdavUrl: string;
+  webdavUsername: string;
+  webdavPassword: string;
+  lastSyncTime: string | null;
 }
