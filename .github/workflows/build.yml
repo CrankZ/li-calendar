@@ -45,12 +45,6 @@ jobs:
           rustup update stable
           rustup target add ${{ matrix.target }}
 
-      - name: Setup Rust (Windows)
-        if: matrix.platform == 'windows-latest'
-        uses: taiki-e/create-rust-cross@v1
-        with:
-          target: x86_64-pc-windows-msvc
-
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
