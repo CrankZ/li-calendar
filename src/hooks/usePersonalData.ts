@@ -12,19 +12,31 @@ export function usePersonalData() {
   const todoOperations = {
     add: useCallback(
       (
-        content: string,
-        dueDate: string | null = null,
-        priority: TodoItem['priority'] = 'medium',
+        contentOrTodo: string | Omit<TodoItem, 'id' | 'createdAt' | 'updatedAt'>,
+        dueDate?: string | null,
+        priority?: TodoItem['priority'],
       ) => {
-        const newTodo: TodoItem = {
-          id: generateId(),
-          content,
-          completed: false,
-          dueDate,
-          priority,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+        let newTodo: TodoItem;
+        if (typeof contentOrTodo === 'string') {
+          newTodo = {
+            id: generateId(),
+            content: contentOrTodo,
+            completed: false,
+            dueDate: dueDate ?? null,
+            priority: priority ?? 'medium',
+            remindEnabled: false,
+            remindIntervalMinutes: 30,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+        } else {
+          newTodo = {
+            ...contentOrTodo,
+            id: generateId(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+        }
         void sync({ todos: [...config.todos, newTodo] });
         return newTodo;
       },

@@ -61,6 +61,10 @@ const personalDataConfigDefaults = {
   todoVisible: true,
   scheduleVisible: true,
   birthdayVisible: true,
+  reminderConfig: {
+    enabled: true,
+    checkIntervalSeconds: 60,
+  },
 } satisfies PersonalDataConfig;
 
 const webdavConfigDefaults = {

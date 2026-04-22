@@ -117,6 +117,10 @@ export interface TodoItem {
   completed: boolean;
   dueDate: string | null;
   priority: 'low' | 'medium' | 'high';
+  /** 是否启用提醒 */
+  remindEnabled: boolean;
+  /** 提醒间隔（分钟） */
+  remindIntervalMinutes: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -128,7 +132,12 @@ export interface ScheduleItem {
   startTime: string | null;
   endTime: string | null;
   description: string;
+  /** 提前多少分钟提醒 */
   remindBefore: number | null;
+  /** 是否启用重复提醒 */
+  remindEnabled: boolean;
+  /** 重复提醒间隔（分钟），0 表示只提醒一次 */
+  remindIntervalMinutes: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -138,9 +147,31 @@ export interface BirthdayItem {
   name: string;
   date: string;
   isLunar: boolean;
+  /** 提前多少天提醒 */
   remindDays: number;
+  /** 是否启用提醒 */
+  remindEnabled: boolean;
+  /** 重复提醒间隔（天），0 表示只提醒一次 */
+  remindIntervalDays: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ReminderConfig {
+  /** 全局提醒开关 */
+  enabled: boolean;
+  /** 提前检查时间（秒），默认 60 秒 */
+  checkIntervalSeconds: number;
+}
+
+export interface PersonalDataConfig {
+  todos: TodoItem[];
+  schedules: ScheduleItem[];
+  birthdays: BirthdayItem[];
+  todoVisible: boolean;
+  scheduleVisible: boolean;
+  birthdayVisible: boolean;
+  reminderConfig: ReminderConfig;
 }
 
 export interface PersonalDataConfig {

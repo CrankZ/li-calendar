@@ -2,6 +2,7 @@ import React, { type CSSProperties } from 'react';
 import '../../utils/calendar/setupDayjsCalendar.ts';
 import { CalendarViewProvider } from '../../hooks/calender/CalendarViewContext.tsx';
 import { useCalendarViewModel } from '../../hooks/calender/useCalendarViewModel.ts';
+import { useReminder } from '../../hooks/useReminder.ts';
 import CalendarFooter from './subs/CalendarFooter.tsx';
 import CalendarHeader from './subs/CalendarHeader.tsx';
 import CalendarMonthGrid from './subs/CalendarMonthGrid.tsx';
@@ -60,6 +61,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     showCloseButton,
     style,
   });
+
+  /** 提醒功能 */
+  useReminder();
 
   return (
     <CalendarViewProvider value={model}>

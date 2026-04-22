@@ -56,8 +56,17 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
   const handleAddTodo = (values: {
     content: string;
     priority?: 'low' | 'medium' | 'high';
+    remindEnabled?: boolean;
+    remindIntervalMinutes?: number;
   }): void => {
-    todoOperations.add(values.content, dateStr, values.priority || 'medium');
+    todoOperations.add({
+      content: values.content,
+      completed: false,
+      dueDate: dateStr,
+      priority: values.priority || 'medium',
+      remindEnabled: values.remindEnabled || false,
+      remindIntervalMinutes: values.remindIntervalMinutes || 30,
+    });
     todoForm.resetFields();
     setTodoModalOpen(false);
   };
@@ -67,6 +76,9 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
     startTime?: dayjs.Dayjs;
     endTime?: dayjs.Dayjs;
     description?: string;
+    remindEnabled?: boolean;
+    remindBefore?: number;
+    remindIntervalMinutes?: number;
   }): void => {
     scheduleOperations.add({
       title: values.title,
@@ -74,18 +86,27 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
       startTime: values.startTime?.format('HH:mm') || null,
       endTime: values.endTime?.format('HH:mm') || null,
       description: values.description || '',
-      remindBefore: null,
+      remindBefore: values.remindBefore || 30,
+      remindEnabled: values.remindEnabled || false,
+      remindIntervalMinutes: values.remindIntervalMinutes || 0,
     });
     scheduleForm.resetFields();
     setScheduleModalOpen(false);
   };
 
-  const handleAddBirthday = (values: { name: string; remindDays?: number }): void => {
+  const handleAddBirthday = (values: {
+    name: string;
+    remindDays?: number;
+    remindEnabled?: boolean;
+    remindIntervalDays?: number;
+  }): void => {
     birthdayOperations.add({
       name: values.name,
       date: selectedDate.format('MM-DD'),
       isLunar: false,
       remindDays: values.remindDays || 7,
+      remindEnabled: values.remindEnabled || false,
+      remindIntervalDays: values.remindIntervalDays || 0,
     });
     birthdayForm.resetFields();
     setBirthdayModalOpen(false);
@@ -307,6 +328,30 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
               ]}
             />
           </Form.Item>
+          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked" initialValue={false}>
+            <Checkbox>启用提醒</Checkbox>
+          </Form.Item>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prev, curr) => prev.remindEnabled !== curr.remindEnabled}
+          >
+            {({ getFieldValue }) =>
+              getFieldValue('remindEnabled') && (
+                <Form.Item name="remindIntervalMinutes" label="提醒间隔" initialValue={30}>
+                  <Select
+                    options={[
+                      { value: 5, label: '5分钟' },
+                      { value: 15, label: '15分钟' },
+                      { value: 30, label: '30分钟' },
+                      { value: 60, label: '1小时' },
+                      { value: 120, label: '2小时' },
+                      { value: 1440, label: '1天' },
+                    ]}
+                  />
+                </Form.Item>
+              )
+            }
+          </Form.Item>
           <Form.Item style={{ marginBottom: 0 }}>
             <Space>
               <Button type="primary" htmlType="submit">
@@ -349,6 +394,42 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
           <Form.Item name="description" label="描述">
             <Input.TextArea rows={2} />
           </Form.Item>
+          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked" initialValue={false}>
+            <Checkbox>启用提醒</Checkbox>
+          </Form.Item>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prev, curr) => prev.remindEnabled !== curr.remindEnabled}
+          >
+            {({ getFieldValue }) =>
+              getFieldValue('remindEnabled') && (
+                <>
+                  <Form.Item name="remindBefore" label="提前" initialValue={30}>
+                    <Select
+                      options={[
+                        { value: 5, label: '5分钟' },
+                        { value: 15, label: '15分钟' },
+                        { value: 30, label: '30分钟' },
+                        { value: 60, label: '1小时' },
+                        { value: 1440, label: '1天' },
+                      ]}
+                    />
+                  </Form.Item>
+                  <Form.Item name="remindIntervalMinutes" label="重复间隔" initialValue={0}>
+                    <Select
+                      options={[
+                        { value: 0, label: '不重复' },
+                        { value: 5, label: '每5分钟' },
+                        { value: 15, label: '每15分钟' },
+                        { value: 30, label: '每30分钟' },
+                        { value: 60, label: '每小时' },
+                      ]}
+                    />
+                  </Form.Item>
+                </>
+              )
+            }
+          </Form.Item>
           <Form.Item style={{ marginBottom: 0 }}>
             <Space>
               <Button type="primary" htmlType="submit">
@@ -380,16 +461,40 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
           <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="remindDays" label="提前提醒天数" initialValue={7}>
-            <Select
-              options={[
-                { value: 1, label: '1天' },
-                { value: 3, label: '3天' },
-                { value: 7, label: '7天' },
-                { value: 14, label: '14天' },
-                { value: 30, label: '30天' },
-              ]}
-            />
+          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked" initialValue={false}>
+            <Checkbox>启用提醒</Checkbox>
+          </Form.Item>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prev, curr) => prev.remindEnabled !== curr.remindEnabled}
+          >
+            {({ getFieldValue }) =>
+              getFieldValue('remindEnabled') && (
+                <>
+                  <Form.Item name="remindDays" label="提前提醒" initialValue={7}>
+                    <Select
+                      options={[
+                        { value: 1, label: '1天' },
+                        { value: 3, label: '3天' },
+                        { value: 7, label: '7天' },
+                        { value: 14, label: '14天' },
+                        { value: 30, label: '30天' },
+                      ]}
+                    />
+                  </Form.Item>
+                  <Form.Item name="remindIntervalDays" label="重复间隔" initialValue={0}>
+                    <Select
+                      options={[
+                        { value: 0, label: '不重复' },
+                        { value: 1, label: '每天' },
+                        { value: 7, label: '每周' },
+                        { value: 30, label: '每月' },
+                      ]}
+                    />
+                  </Form.Item>
+                </>
+              )
+            }
           </Form.Item>
           <Form.Item style={{ marginBottom: 0 }}>
             <Space>

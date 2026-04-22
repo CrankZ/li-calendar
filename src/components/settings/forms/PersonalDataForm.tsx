@@ -50,6 +50,8 @@ const PersonalDataForm: React.FC = () => {
     endTime?: string;
     description?: string;
     remindBefore?: number;
+    remindEnabled?: boolean;
+    remindIntervalMinutes?: number;
   }): void => {
     scheduleOperations.add({
       title: values.title,
@@ -57,7 +59,9 @@ const PersonalDataForm: React.FC = () => {
       startTime: values.startTime || null,
       endTime: values.endTime || null,
       description: values.description || '',
-      remindBefore: values.remindBefore || null,
+      remindBefore: values.remindBefore || 30,
+      remindEnabled: values.remindEnabled || false,
+      remindIntervalMinutes: values.remindIntervalMinutes || 0,
     });
     scheduleForm.resetFields();
     setScheduleModalOpen(false);
@@ -68,12 +72,16 @@ const PersonalDataForm: React.FC = () => {
     date: dayjs.Dayjs;
     isLunar: boolean;
     remindDays?: number;
+    remindEnabled?: boolean;
+    remindIntervalDays?: number;
   }): void => {
     birthdayOperations.add({
       name: values.name,
       date: values.date.format('MM-DD'),
       isLunar: values.isLunar,
       remindDays: values.remindDays || 7,
+      remindEnabled: values.remindEnabled || false,
+      remindIntervalDays: values.remindIntervalDays || 0,
     });
     birthdayForm.resetFields();
     setBirthdayModalOpen(false);
