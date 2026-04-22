@@ -292,16 +292,20 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <CalendarOutlined />
             <span>{dateDisplay}</span>
-            <span style={{ fontSize: 12, color: '#999', fontWeight: 'normal' }}>
+            <span style={{ fontSize: 12, color: 'var(--text-sec)', fontWeight: 'normal' }}>
               {selectedDate.format('YYYY年')}
             </span>
           </div>
         }
-        placement="right"
+        placement="left"
         onClose={onClose}
         open={open}
         width={320}
         closeIcon={<CloseOutlined />}
+        styles={{
+          body: { padding: '12px' },
+          header: { padding: '12px 16px' },
+        }}
       >
         <Tabs defaultActiveKey="todo" items={tabItems} />
       </Drawer>
