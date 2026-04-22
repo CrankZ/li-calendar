@@ -11,11 +11,18 @@ export function createCalendarHeaderStyles(ctx: CalendarViewStyleContext) {
       flex-direction: column;
       gap: 8px;
     `,
-    headerContent: css`
+    headerTopRow: css`
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
+    `,
+    headerContent: css`
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
     `,
     headerActions: css`
       display: flex;
@@ -105,18 +112,19 @@ export function createCalendarHeaderStyles(ctx: CalendarViewStyleContext) {
     weatherBadge: css`
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      background: ${isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'};
-      border-radius: 12px;
+      gap: 8px;
+      padding: 8px 16px;
+      background: ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'};
+      border-radius: 16px;
       cursor: pointer;
       transition: background 0.2s;
+      flex-shrink: 0;
       &:hover {
-        background: ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)'};
+        background: ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)'};
       }
     `,
     weatherTemp: css`
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 500;
     `,
     weatherSidebarList: css`

@@ -34,7 +34,8 @@ export interface ConfigItem
     ConfigMacos,
     WeatherConfig,
     PersonalDataConfig,
-    WebDAVConfig {}
+    WebDAVConfig,
+    MainWindowConfig {}
 
 export interface SystemConfig {
   // 开机自启动
@@ -53,6 +54,13 @@ export interface CalendarFooterVisible {
   footerYiJiVisible: boolean;
   /** 显示倒计时信息 */
   footerCountdownVisible: boolean;
+}
+
+export type MainWindowDateFormat = 'MMMd' | 'MMMdEEE' | 'MdE';
+
+export interface MainWindowConfig {
+  /** 主窗口日期格式 */
+  mainWindowDateFormat: MainWindowDateFormat;
 }
 
 export interface ConfigWindows extends WindowsDesktop, WindowsTaskbar {

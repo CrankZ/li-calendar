@@ -1,4 +1,4 @@
-import { Button, Divider, Form, Input, List, Space, Switch } from 'antd';
+import { Button, Divider, Form, Input, List, Select, Space, Switch } from 'antd';
 import React, { useState } from 'react';
 import { searchCities } from '../../../http/weather.ts';
 import { syncValuesConfig } from '../../../sync/base/syncValuesConfig.ts';
@@ -161,6 +161,13 @@ const CalendarForm: React.FC = () => {
       </Form.Item>
       <Form.Item name="footerCountdownVisible" label="显示节日倒计时">
         <Switch />
+      </Form.Item>
+      <Form.Item name="mainWindowDateFormat" label="日期格式">
+        <Select>
+          <Select.Option value="MMMd">4月22日</Select.Option>
+          <Select.Option value="MMMdEEE">4月22日 周二</Select.Option>
+          <Select.Option value="MdE">4/22 周二</Select.Option>
+        </Select>
       </Form.Item>
     </Form>
   );

@@ -5,6 +5,7 @@ import type {
   ConfigItem,
   ConfigMacos,
   ConfigWindows,
+  MainWindowConfig,
   PersonalDataConfig,
   SystemConfig,
   WeatherConfig,
@@ -75,6 +76,10 @@ const webdavConfigDefaults = {
   lastSyncTime: null,
 } satisfies WebDAVConfig;
 
+const mainWindowConfigDefaults = {
+  mainWindowDateFormat: 'MMMdEEE',
+} satisfies MainWindowConfig;
+
 const configDefaults: ConfigItem = {
   ...systemConfigDefaults,
   ...calendarFooterVisibleDefaults,
@@ -83,6 +88,7 @@ const configDefaults: ConfigItem = {
   ...weatherConfigDefaults,
   ...personalDataConfigDefaults,
   ...webdavConfigDefaults,
+  ...mainWindowConfigDefaults,
 };
 
 export const useConfigSync = createSync<ConfigItem>('liConfig', configDefaults);

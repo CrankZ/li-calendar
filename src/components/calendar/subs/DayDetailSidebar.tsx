@@ -1,6 +1,6 @@
 import {
+  BellOutlined,
   CalendarOutlined,
-  CheckCircleOutlined,
   CloseOutlined,
   DeleteOutlined,
   GiftOutlined,
@@ -10,15 +10,16 @@ import {
 import {
   Avatar,
   Button,
+  Card,
   Checkbox,
-  Drawer,
+  DatePicker,
   Form,
   Input,
   List,
   Modal,
   Select,
   Space,
-  Tabs,
+  Switch,
   Tag,
   TimePicker,
 } from 'antd';
@@ -33,7 +34,7 @@ interface DayDetailSidebarProps {
   onClose: () => void;
 }
 
-function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps): ReactElement {
+function DayDetailSidebar({ selectedDate, onClose }: DayDetailSidebarProps): ReactElement {
   const { todos, schedules, birthdays, todoOperations, scheduleOperations, birthdayOperations } =
     usePersonalData();
 
@@ -43,26 +44,34 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
   const [todoForm] = Form.useForm();
   const [scheduleForm] = Form.useForm();
   const [birthdayForm] = Form.useForm();
+  const [showLunar, setShowLunar] = useState(false);
 
-  const dateStr = selectedDate.format('YYYY-MM-DD');
-  const dateDisplay = selectedDate.format('M月D日');
+  const today = dayjs().format('YYYY-MM-DD');
+  const displayDate = selectedDate || dayjs();
+  const displayDateStr = displayDate.format('YYYY-MM-DD');
+  const displayMonthDay = displayDate.format('MM-DD');
 
-  const dayTodos = todos.filter((t: TodoItem) => t.dueDate === dateStr);
-  const daySchedules = schedules.filter((s: ScheduleItem) => s.date === dateStr);
-  const dayBirthdays = birthdays.filter(
-    (b: BirthdayItem) => b.date === selectedDate.format('MM-DD'),
+  const incompleteTodos = todos.filter(
+    (t: TodoItem) => t.dueDate === displayDateStr || (!t.dueDate && displayDateStr === today),
   );
+  const completedTodos = todos.filter(
+    (t: TodoItem) =>
+      t.completed && (t.dueDate === displayDateStr || (!t.dueDate && displayDateStr === today)),
+  );
+  const daySchedules = schedules.filter((s: ScheduleItem) => s.date === displayDateStr);
+  const dayBirthdays = birthdays.filter((b: BirthdayItem) => b.date === displayMonthDay);
 
   const handleAddTodo = (values: {
     content: string;
     priority?: 'low' | 'medium' | 'high';
+    dueDate?: dayjs.Dayjs;
     remindEnabled?: boolean;
     remindIntervalMinutes?: number;
   }): void => {
     todoOperations.add({
       content: values.content,
       completed: false,
-      dueDate: dateStr,
+      dueDate: values.dueDate?.format('YYYY-MM-DD') || today,
       priority: values.priority || 'medium',
       remindEnabled: values.remindEnabled || false,
       remindIntervalMinutes: values.remindIntervalMinutes || 30,
@@ -73,6 +82,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
 
   const handleAddSchedule = (values: {
     title: string;
+    date?: dayjs.Dayjs;
     startTime?: dayjs.Dayjs;
     endTime?: dayjs.Dayjs;
     description?: string;
@@ -82,7 +92,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
   }): void => {
     scheduleOperations.add({
       title: values.title,
-      date: dateStr,
+      date: values.date?.format('YYYY-MM-DD') || today,
       startTime: values.startTime?.format('HH:mm') || null,
       endTime: values.endTime?.format('HH:mm') || null,
       description: values.description || '',
@@ -96,14 +106,16 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
 
   const handleAddBirthday = (values: {
     name: string;
+    date?: dayjs.Dayjs;
+    isLunar?: boolean;
     remindDays?: number;
     remindEnabled?: boolean;
     remindIntervalDays?: number;
   }): void => {
     birthdayOperations.add({
       name: values.name,
-      date: selectedDate.format('MM-DD'),
-      isLunar: false,
+      date: values.date?.format('MM-DD') || today.split('-').slice(1).join('-'),
+      isLunar: values.isLunar || false,
       remindDays: values.remindDays || 7,
       remindEnabled: values.remindEnabled || false,
       remindIntervalDays: values.remindIntervalDays || 0,
@@ -112,206 +124,233 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
     setBirthdayModalOpen(false);
   };
 
-  const tabItems = [
-    {
-      key: 'todo',
-      label: (
-        <span>
-          <CheckCircleOutlined /> 待办
-        </span>
-      ),
-      children: (
-        <div className="day-detail-section">
-          <List
-            size="small"
-            dataSource={dayTodos}
-            locale={{ emptyText: '暂无待办' }}
-            renderItem={(todo) => (
-              <List.Item
-                actions={[
-                  <Button
-                    key="delete"
-                    size="small"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => todoOperations.delete(todo.id)}
-                  />,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Checkbox
-                      checked={todo.completed}
-                      onChange={() => todoOperations.toggle(todo.id)}
-                    />
-                  }
-                  title={
-                    <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
-                      {todo.content}
-                    </span>
-                  }
-                  description={
-                    <Space>
-                      <Tag
-                        color={
-                          todo.priority === 'high'
-                            ? 'red'
-                            : todo.priority === 'medium'
-                              ? 'orange'
-                              : 'green'
-                        }
-                      >
-                        {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
-                      </Tag>
-                    </Space>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() => setTodoModalOpen(true)}
-            block
-            style={{ marginTop: 8 }}
-          >
-            添加待办
-          </Button>
-        </div>
-      ),
-    },
-    {
-      key: 'schedule',
-      label: (
-        <span>
-          <ScheduleOutlined /> 日程
-        </span>
-      ),
-      children: (
-        <div className="day-detail-section">
-          <List
-            size="small"
-            dataSource={daySchedules}
-            locale={{ emptyText: '暂无日程' }}
-            renderItem={(schedule) => (
-              <List.Item
-                actions={[
-                  <Button
-                    key="delete"
-                    size="small"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => scheduleOperations.delete(schedule.id)}
-                  />,
-                ]}
-              >
-                <List.Item.Meta
-                  title={schedule.title}
-                  description={
-                    <div>
-                      {schedule.startTime && (
-                        <div>
-                          {schedule.startTime}
-                          {schedule.endTime ? ` - ${schedule.endTime}` : ''}
-                        </div>
-                      )}
-                      {schedule.description && (
-                        <div style={{ color: '#999' }}>{schedule.description}</div>
-                      )}
-                    </div>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() => setScheduleModalOpen(true)}
-            block
-            style={{ marginTop: 8 }}
-          >
-            添加日程
-          </Button>
-        </div>
-      ),
-    },
-    {
-      key: 'birthday',
-      label: (
-        <span>
-          <GiftOutlined /> 生日
-        </span>
-      ),
-      children: (
-        <div className="day-detail-section">
-          <List
-            size="small"
-            dataSource={dayBirthdays}
-            locale={{ emptyText: '暂无生日' }}
-            renderItem={(birthday) => (
-              <List.Item
-                actions={[
-                  <Button
-                    key="delete"
-                    size="small"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => birthdayOperations.delete(birthday.id)}
-                  />,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar size="small" style={{ backgroundColor: '#1890ff' }}>
-                      {birthday.name[0]}
-                    </Avatar>
-                  }
-                  title={birthday.name}
-                  description={birthday.isLunar ? '农历' : '公历'}
-                />
-              </List.Item>
-            )}
-          />
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() => setBirthdayModalOpen(true)}
-            block
-            style={{ marginTop: 8 }}
-          >
-            添加生日
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
   return (
     <>
-      <Drawer
+      <Card
+        className="day-detail-sidebar"
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <CalendarOutlined />
-            <span>{dateDisplay}</span>
-            <span style={{ fontSize: 12, color: 'var(--text-sec)', fontWeight: 'normal' }}>
-              {selectedDate.format('YYYY年')}
+            <span>
+              {displayDate.format('MM月DD日')}
+              {displayDate.isSame(dayjs(), 'day') ? ' (今天)' : ''}
             </span>
           </div>
         }
-        placement="left"
-        onClose={onClose}
-        open={open}
-        width={320}
-        closeIcon={<CloseOutlined />}
-        styles={{
-          body: { padding: '12px' },
-          header: { padding: '12px 16px' },
-        }}
+        extra={
+          <Space size={4}>
+            <Switch
+              size="small"
+              checkedChildren="农历"
+              unCheckedChildren="公历"
+              checked={showLunar}
+              onChange={setShowLunar}
+              style={{ marginRight: 4 }}
+            />
+            <DatePicker
+              size="small"
+              value={displayDate}
+              onChange={(date) => date && onClose()}
+              allowClear={false}
+              style={{ width: 100 }}
+            />
+            <Button type="text" icon={<CloseOutlined />} onClick={onClose} size="small" />
+          </Space>
+        }
+        style={{ width: 320 }}
+        styles={{ body: { padding: 0 } }}
       >
-        <Tabs defaultActiveKey="todo" items={tabItems} />
-      </Drawer>
+        <div style={{ padding: 12 }}>
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-sec)', marginBottom: 8 }}>
+              <BellOutlined /> 待办事项
+            </div>
+            <List
+              size="small"
+              dataSource={incompleteTodos.slice(0, 5)}
+              locale={{ emptyText: '暂无待办' }}
+              renderItem={(todo: TodoItem) => (
+                <List.Item
+                  style={{ padding: '4px 0' }}
+                  actions={[
+                    <Button
+                      key="delete"
+                      type="text"
+                      danger
+                      size="small"
+                      icon={<DeleteOutlined />}
+                      onClick={() => todoOperations.delete(todo.id)}
+                    />,
+                  ]}
+                >
+                  <List.Item.Meta
+                    avatar={
+                      <Checkbox
+                        checked={todo.completed}
+                        onChange={() => todoOperations.toggle(todo.id)}
+                      />
+                    }
+                    title={<span style={{ fontSize: 13 }}>{todo.content}</span>}
+                    description={
+                      todo.remindEnabled && (
+                        <Tag color="blue" style={{ fontSize: 10 }}>
+                          提醒
+                        </Tag>
+                      )
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+            <Button
+              type="dashed"
+              icon={<PlusOutlined />}
+              onClick={() => setTodoModalOpen(true)}
+              block
+              size="small"
+              style={{ marginTop: 8 }}
+            >
+              添加待办
+            </Button>
+          </div>
+
+          {completedTodos.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: 'var(--text-sec)', marginBottom: 8 }}>已完成</div>
+              <List
+                size="small"
+                dataSource={completedTodos.slice(0, 3)}
+                locale={{ emptyText: '' }}
+                renderItem={(todo: TodoItem) => (
+                  <List.Item style={{ padding: '4px 0' }}>
+                    <List.Item.Meta
+                      avatar={
+                        <Checkbox
+                          checked={todo.completed}
+                          onChange={() => todoOperations.toggle(todo.id)}
+                        />
+                      }
+                      title={
+                        <span
+                          style={{
+                            fontSize: 13,
+                            textDecoration: 'line-through',
+                            color: 'var(--text-sec)',
+                          }}
+                        >
+                          {todo.content}
+                        </span>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            </div>
+          )}
+
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-sec)', marginBottom: 8 }}>
+              <ScheduleOutlined /> 日程
+            </div>
+            <List
+              size="small"
+              dataSource={daySchedules.slice(0, 3)}
+              locale={{ emptyText: '暂无日程' }}
+              renderItem={(schedule: ScheduleItem) => (
+                <List.Item
+                  style={{ padding: '4px 0' }}
+                  actions={[
+                    <Button
+                      key="delete"
+                      type="text"
+                      danger
+                      size="small"
+                      icon={<DeleteOutlined />}
+                      onClick={() => scheduleOperations.delete(schedule.id)}
+                    />,
+                  ]}
+                >
+                  <List.Item.Meta
+                    title={<span style={{ fontSize: 13 }}>{schedule.title}</span>}
+                    description={
+                      schedule.startTime && (
+                        <span style={{ fontSize: 12, color: 'var(--text-sec)' }}>
+                          {schedule.startTime}
+                          {schedule.endTime ? ` - ${schedule.endTime}` : ''}
+                        </span>
+                      )
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+            <Button
+              type="dashed"
+              icon={<PlusOutlined />}
+              onClick={() => setScheduleModalOpen(true)}
+              block
+              size="small"
+              style={{ marginTop: 8 }}
+            >
+              添加日程
+            </Button>
+          </div>
+
+          <div>
+            <div style={{ fontSize: 12, color: 'var(--text-sec)', marginBottom: 8 }}>
+              <GiftOutlined /> 生日
+              {showLunar && <span style={{ fontWeight: 'normal' }}> (农历)</span>}
+            </div>
+            <List
+              size="small"
+              dataSource={dayBirthdays.filter((b) => b.isLunar === showLunar).slice(0, 3)}
+              locale={{ emptyText: '暂无生日' }}
+              renderItem={(birthday: BirthdayItem) => (
+                <List.Item
+                  style={{ padding: '4px 0' }}
+                  actions={[
+                    <Button
+                      key="delete"
+                      type="text"
+                      danger
+                      size="small"
+                      icon={<DeleteOutlined />}
+                      onClick={() => birthdayOperations.delete(birthday.id)}
+                    />,
+                  ]}
+                >
+                  <List.Item.Meta
+                    avatar={
+                      <Avatar size="small" style={{ backgroundColor: '#1890ff' }}>
+                        {birthday.name[0]}
+                      </Avatar>
+                    }
+                    title={<span style={{ fontSize: 13 }}>{birthday.name}</span>}
+                    description={
+                      <span style={{ fontSize: 11, color: 'var(--text-sec)' }}>
+                        {birthday.isLunar ? '农历' : '公历'} {birthday.date}
+                      </span>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+            <Button
+              type="dashed"
+              icon={<PlusOutlined />}
+              onClick={() => setBirthdayModalOpen(true)}
+              block
+              size="small"
+              style={{ marginTop: 8 }}
+            >
+              添加生日
+            </Button>
+          </div>
+        </div>
+      </Card>
 
       <Modal
-        title={`添加待办 - ${dateDisplay}`}
+        title="添加待办"
         open={todoModalOpen}
         onCancel={() => {
           setTodoModalOpen(false);
@@ -319,11 +358,19 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
         }}
         footer={null}
       >
-        <Form form={todoForm} onFinish={handleAddTodo} layout="vertical">
+        <Form
+          form={todoForm}
+          onFinish={handleAddTodo}
+          layout="vertical"
+          initialValues={{ dueDate: displayDate, priority: 'medium', remindEnabled: false }}
+        >
           <Form.Item name="content" label="内容" rules={[{ required: true }]}>
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="priority" label="优先级" initialValue="medium">
+          <Form.Item name="dueDate" label="日期">
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="priority" label="优先级">
             <Select
               options={[
                 { value: 'low', label: '低' },
@@ -332,8 +379,8 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
               ]}
             />
           </Form.Item>
-          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked" initialValue={false}>
-            <Checkbox>启用提醒</Checkbox>
+          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked">
+            <Switch />
           </Form.Item>
           <Form.Item
             noStyle
@@ -341,7 +388,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
           >
             {({ getFieldValue }) =>
               getFieldValue('remindEnabled') && (
-                <Form.Item name="remindIntervalMinutes" label="提醒间隔" initialValue={30}>
+                <Form.Item name="remindIntervalMinutes" label="提醒间隔">
                   <Select
                     options={[
                       { value: 5, label: '5分钟' },
@@ -375,7 +422,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
       </Modal>
 
       <Modal
-        title={`添加日程 - ${dateDisplay}`}
+        title="添加日程"
         open={scheduleModalOpen}
         onCancel={() => {
           setScheduleModalOpen(false);
@@ -383,9 +430,17 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
         }}
         footer={null}
       >
-        <Form form={scheduleForm} onFinish={handleAddSchedule} layout="vertical">
+        <Form
+          form={scheduleForm}
+          onFinish={handleAddSchedule}
+          layout="vertical"
+          initialValues={{ date: displayDate, remindEnabled: false }}
+        >
           <Form.Item name="title" label="标题" rules={[{ required: true }]}>
             <Input />
+          </Form.Item>
+          <Form.Item name="date" label="日期">
+            <DatePicker style={{ width: '100%' }} />
           </Form.Item>
           <Space style={{ width: '100%' }}>
             <Form.Item name="startTime" label="开始时间" style={{ flex: 1 }}>
@@ -398,8 +453,8 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
           <Form.Item name="description" label="描述">
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked" initialValue={false}>
-            <Checkbox>启用提醒</Checkbox>
+          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked">
+            <Switch />
           </Form.Item>
           <Form.Item
             noStyle
@@ -408,7 +463,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
             {({ getFieldValue }) =>
               getFieldValue('remindEnabled') && (
                 <>
-                  <Form.Item name="remindBefore" label="提前" initialValue={30}>
+                  <Form.Item name="remindBefore" label="提前提醒">
                     <Select
                       options={[
                         { value: 5, label: '5分钟' },
@@ -419,7 +474,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
                       ]}
                     />
                   </Form.Item>
-                  <Form.Item name="remindIntervalMinutes" label="重复间隔" initialValue={0}>
+                  <Form.Item name="remindIntervalMinutes" label="重复间隔">
                     <Select
                       options={[
                         { value: 0, label: '不重复' },
@@ -453,7 +508,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
       </Modal>
 
       <Modal
-        title={`添加生日 - ${dateDisplay}`}
+        title="添加生日"
         open={birthdayModalOpen}
         onCancel={() => {
           setBirthdayModalOpen(false);
@@ -461,12 +516,23 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
         }}
         footer={null}
       >
-        <Form form={birthdayForm} onFinish={handleAddBirthday} layout="vertical">
+        <Form
+          form={birthdayForm}
+          onFinish={handleAddBirthday}
+          layout="vertical"
+          initialValues={{ date: displayDate, isLunar: showLunar, remindEnabled: false }}
+        >
           <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked" initialValue={false}>
-            <Checkbox>启用提醒</Checkbox>
+          <Form.Item name="date" label="生日日期">
+            <DatePicker picker="month" style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="isLunar" label="农历" valuePropName="checked">
+            <Switch checkedChildren="农历" unCheckedChildren="公历" />
+          </Form.Item>
+          <Form.Item name="remindEnabled" label="提醒" valuePropName="checked">
+            <Switch />
           </Form.Item>
           <Form.Item
             noStyle
@@ -475,7 +541,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
             {({ getFieldValue }) =>
               getFieldValue('remindEnabled') && (
                 <>
-                  <Form.Item name="remindDays" label="提前提醒" initialValue={7}>
+                  <Form.Item name="remindDays" label="提前提醒">
                     <Select
                       options={[
                         { value: 1, label: '1天' },
@@ -486,7 +552,7 @@ function DayDetailSidebar({ open, selectedDate, onClose }: DayDetailSidebarProps
                       ]}
                     />
                   </Form.Item>
-                  <Form.Item name="remindIntervalDays" label="重复间隔" initialValue={0}>
+                  <Form.Item name="remindIntervalDays" label="重复间隔">
                     <Select
                       options={[
                         { value: 0, label: '不重复' },

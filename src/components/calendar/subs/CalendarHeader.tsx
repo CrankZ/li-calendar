@@ -11,6 +11,7 @@ import type { Lunar } from 'lunar-typescript';
 import type { ReactElement } from 'react';
 import { useCalendarViewContext } from '../../../hooks/calender/CalendarViewContext.tsx';
 import type { CalendarViewClassNames } from '../../../styles/useCalendarViewStyles.ts';
+import { useConfigSync } from '../../../sync/configStore.ts';
 import { weekdayNames } from '../../../utils/calendar/calendarFestivals.ts';
 import { WeatherDisplay } from '../../weather/WeatherDisplay.tsx';
 
@@ -52,6 +53,7 @@ export interface CalendarHeaderProps {
 function CalendarHeader(): ReactElement {
   /** 从上下文读取顶栏渲染所需的全部状态与回调。 */
   const { headerProps } = useCalendarViewContext();
+  const { data: config } = useConfigSync();
   const {
     styles,
     selectedDate,
@@ -67,18 +69,30 @@ function CalendarHeader(): ReactElement {
     onOpenMainWindow,
   } = headerProps;
 
+  const formatDate = (date: Dayjs): string => {
+    const fmt = config.mainWindowDateFormat || 'MMMdEEE';
+    switch (fmt) {
+      case 'MMMd':
+        return date.format('M月D日');
+      case 'MdE':
+        return `${date.format('M/D')} ${weekdayNames[date.day()]}`;
+      case 'MMMdEEE':
+        return `${date.format('M月D日')} ${weekdayNames[date.day()]}`;
+    }
+  };
+
   return (
     <div className={styles.header}>
-      <WeatherDisplay styles={styles} />
-      <div className={styles.headerContent} data-tauri-drag-region={dragRegion || undefined}>
-        <div>
-          <div className={styles.title}>
-            {selectedDate.format('M月D日')} {weekdayNames[selectedDate.day()]}
-          </div>
-          <div className={styles.subtitle}>
-            {selectedLunar.getMonthInChinese()}月{selectedLunar.getDayInChinese()}{' '}
-            {selectedLunar.getYearInGanZhi()}
-            {selectedLunar.getYearShengXiao()}
+      <div className={styles.headerTopRow} data-tauri-drag-region={dragRegion || undefined}>
+        <div className={styles.headerContent}>
+          <WeatherDisplay styles={styles} />
+          <div>
+            <div className={styles.title}>{formatDate(selectedDate)}</div>
+            <div className={styles.subtitle}>
+              {selectedLunar.getMonthInChinese()}月{selectedLunar.getDayInChinese()}{' '}
+              {selectedLunar.getYearInGanZhi()}
+              {selectedLunar.getYearShengXiao()}
+            </div>
           </div>
         </div>
         {(showThemeButton || showPinButton || showSettingsButton) && (

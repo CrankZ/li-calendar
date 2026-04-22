@@ -72,14 +72,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         <CalendarMonthNav />
         <CalendarMonthGrid />
         <CalendarFooter />
-        {model.sidebarDate && (
-          <DayDetailSidebar
-            open={true}
-            selectedDate={model.sidebarDate}
-            onClose={() => model.setSidebarDate(null)}
-          />
-        )}
       </div>
+      {model.sidebarDate && (
+        <DayDetailSidebar
+          open={true}
+          selectedDate={model.sidebarDate}
+          onClose={() => model.setSidebarDate(null)}
+        />
+      )}
     </CalendarViewProvider>
   );
 };
