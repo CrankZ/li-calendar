@@ -60,92 +60,64 @@ function CalendarHeader(): ReactElement {
     showThemeButton,
     showPinButton,
     showSettingsButton,
-    showCloseButton,
     theme,
     isPinned,
     onToggleTheme,
     onTogglePin,
     onOpenMainWindow,
-    onClose,
   } = headerProps;
 
   return (
     <div className={styles.header}>
-      {/* 左侧为日期主标题与农历副标题，同时可选作为原生拖拽区域。 */}
-      <div className={styles.headerContent} data-tauri-drag-region={dragRegion || undefined}>
-        <div className={styles.title}>
-          {selectedDate.format('YYYY年M月D日')} {weekdayNames[selectedDate.day()]}
-        </div>
-        <div className={styles.subtitle}>
-          {selectedLunar.getMonthInChinese()}月{selectedLunar.getDayInChinese()}{' '}
-          {selectedLunar.getYearInGanZhi()}
-          {selectedLunar.getYearShengXiao()}年
-        </div>
-      </div>
       <WeatherDisplay styles={styles} />
-      {/* 右侧操作区按按钮粒度控制，便于移动端与桌面端复用同一个头部组件。 */}
-      {(showThemeButton || showPinButton || showSettingsButton || showCloseButton) && (
-        <div className={styles.headerActions}>
-          {showThemeButton && (
-            <Tooltip title={theme === 'light' ? '切换到暗色模式' : '切换到浅色模式'}>
-              <button
-                className={styles.headerBtn}
-                type="button"
-                onClick={onToggleTheme}
-                aria-label="切换主题"
-              >
-                {theme === 'light' ? <MoonOutlined /> : <SunOutlined />}
-              </button>
-            </Tooltip>
-          )}
-          {showPinButton && (
-            <Tooltip title={isPinned ? '取消固定' : '固定窗口'}>
-              <button
-                className={styles.headerBtn}
-                type="button"
-                onClick={onTogglePin}
-                aria-label="固定窗口"
-                style={isPinned ? { color: 'var(--accent)' } : undefined}
-              >
-                {isPinned ? <PushpinFilled /> : <PushpinOutlined />}
-              </button>
-            </Tooltip>
-          )}
-          {showSettingsButton && (
-            <Tooltip title="设置">
-              <button className={styles.headerBtn} type="button" onClick={onOpenMainWindow}>
-                <SettingOutlined />
-              </button>
-            </Tooltip>
-          )}
-          {showCloseButton && (
-            <Tooltip title="收起">
-              <button
-                className={styles.headerBtn}
-                type="button"
-                aria-label="收起"
-                onClick={onClose}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M2 4L6 8L10 4"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </Tooltip>
-          )}
+      <div className={styles.headerContent} data-tauri-drag-region={dragRegion || undefined}>
+        <div>
+          <div className={styles.title}>
+            {selectedDate.format('M月D日')} {weekdayNames[selectedDate.day()]}
+          </div>
+          <div className={styles.subtitle}>
+            {selectedLunar.getMonthInChinese()}月{selectedLunar.getDayInChinese()}{' '}
+            {selectedLunar.getYearInGanZhi()}
+            {selectedLunar.getYearShengXiao()}
+          </div>
         </div>
-      )}
+        {(showThemeButton || showPinButton || showSettingsButton) && (
+          <div className={styles.headerActions}>
+            {showThemeButton && (
+              <Tooltip title={theme === 'light' ? '切换到暗色模式' : '切换到浅色模式'}>
+                <button
+                  className={styles.headerBtn}
+                  type="button"
+                  onClick={onToggleTheme}
+                  aria-label="切换主题"
+                >
+                  {theme === 'light' ? <MoonOutlined /> : <SunOutlined />}
+                </button>
+              </Tooltip>
+            )}
+            {showPinButton && (
+              <Tooltip title={isPinned ? '取消固定' : '固定窗口'}>
+                <button
+                  className={styles.headerBtn}
+                  type="button"
+                  onClick={onTogglePin}
+                  aria-label="固定窗口"
+                  style={isPinned ? { color: 'var(--accent)' } : undefined}
+                >
+                  {isPinned ? <PushpinFilled /> : <PushpinOutlined />}
+                </button>
+              </Tooltip>
+            )}
+            {showSettingsButton && (
+              <Tooltip title="设置">
+                <button className={styles.headerBtn} type="button" onClick={onOpenMainWindow}>
+                  <SettingOutlined />
+                </button>
+              </Tooltip>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

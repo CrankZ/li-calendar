@@ -44,7 +44,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   showThemeButton = true,
   showPinButton = true,
   showSettingsButton = true,
-  showCloseButton = true,
+  showCloseButton = false,
   style,
 }) => {
   /** 聚合后的日历视图模型，供上下文与各子组件共享。 */

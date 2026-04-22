@@ -333,8 +333,10 @@ export function useCalendarViewModel({
   const gridProps: CalendarMonthGridProps = {
     styles,
     cellModels,
-    onSelectDate: handleSelectDate,
-    onDateDoubleClick: setSidebarDate,
+    onSelectDate: (date) => {
+      handleSelectDate(date);
+      setSidebarDate(date);
+    },
   };
 
   const footerProps: CalendarFooterProps | null = hasFooterContent

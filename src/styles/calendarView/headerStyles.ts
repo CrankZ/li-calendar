@@ -6,15 +6,16 @@ export function createCalendarHeaderStyles(ctx: CalendarViewStyleContext) {
   return {
     header: css`
       text-align: left;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    `,
+    headerContent: css`
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-    `,
-    headerContent: css`
-      display: flex;
-      flex-direction: column;
     `,
     headerActions: css`
       display: flex;
@@ -42,14 +43,13 @@ export function createCalendarHeaderStyles(ctx: CalendarViewStyleContext) {
       }
     `,
     title: css`
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 500;
       line-height: 1.2;
-      margin-bottom: 3px;
       color: var(--text-main);
     `,
     subtitle: css`
-      font-size: 14px;
+      font-size: 12px;
       line-height: 1.25;
       color: var(--text-sec);
       opacity: 0.9;
@@ -105,8 +105,8 @@ export function createCalendarHeaderStyles(ctx: CalendarViewStyleContext) {
     weatherBadge: css`
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
+      gap: 6px;
+      padding: 6px 12px;
       background: ${isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'};
       border-radius: 12px;
       cursor: pointer;
@@ -116,7 +116,7 @@ export function createCalendarHeaderStyles(ctx: CalendarViewStyleContext) {
       }
     `,
     weatherTemp: css`
-      font-size: 13px;
+      font-size: 16px;
       font-weight: 500;
     `,
     weatherSidebarList: css`
