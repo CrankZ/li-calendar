@@ -14,6 +14,8 @@ export interface CalendarMonthGridProps {
   cellModels: CalendarCellViewModel[];
   /** 用户点击某一格时回传该格公历日期 */
   onSelectDate: (date: Dayjs) => void;
+  /** 用户双击某一格时回传该格公历日期 */
+  onDateDoubleClick?: (date: Dayjs) => void;
 }
 
 /**
@@ -21,7 +23,7 @@ export interface CalendarMonthGridProps {
  */
 function CalendarMonthGrid(): ReactElement {
   const { gridProps } = useCalendarViewContext();
-  const { styles, cellModels, onSelectDate } = gridProps;
+  const { styles, cellModels, onSelectDate, onDateDoubleClick } = gridProps;
 
   return (
     <div className={styles.calendarGrid}>
@@ -49,6 +51,7 @@ function CalendarMonthGrid(): ReactElement {
                 [styles.selected]: cell.isSelected && !cell.isToday,
               })}
               onClick={() => onSelectDate(cell.date)}
+              onDoubleClick={() => onDateDoubleClick?.(cell.date)}
             >
               {cell.badgeText && (
                 <span className={classNames(styles.tag, badgeClass)}>{cell.badgeText}</span>

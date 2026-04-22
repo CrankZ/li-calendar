@@ -78,6 +78,10 @@ export interface CalendarViewModel {
   gridProps: CalendarMonthGridProps;
   /** 无底部内容时为 null，由视图层决定是否渲染 */
   footerProps: CalendarFooterProps | null;
+  /** 双击日期时设置的侧边栏日期 */
+  sidebarDate: Dayjs | null;
+  /** 设置侧边栏日期（双击时调用） */
+  setSidebarDate: (date: Dayjs | null) => void;
 }
 
 /**
@@ -139,6 +143,8 @@ export function useCalendarViewModel({
   const [calendarToday, setCalendarToday] = useState<Dayjs>(() => PENDING_BACKEND_TIME);
   /** 当前月网格展示的面板月份。 */
   const [panelMonth, setPanelMonth] = useState<Dayjs>(() => PENDING_BACKEND_TIME);
+  /** 双击日期时设置的侧边栏日期 */
+  const [sidebarDate, setSidebarDate] = useState<Dayjs | null>(null);
 
   const calendarTodayRef = useRef<Dayjs>(PENDING_BACKEND_TIME);
   const selectedDateRef = useRef<Dayjs>(PENDING_BACKEND_TIME);
@@ -328,6 +334,7 @@ export function useCalendarViewModel({
     styles,
     cellModels,
     onSelectDate: handleSelectDate,
+    onDateDoubleClick: setSidebarDate,
   };
 
   const footerProps: CalendarFooterProps | null = hasFooterContent
@@ -349,5 +356,7 @@ export function useCalendarViewModel({
     navProps,
     gridProps,
     footerProps,
+    sidebarDate,
+    setSidebarDate,
   };
 }

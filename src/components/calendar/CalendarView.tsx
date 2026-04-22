@@ -6,6 +6,7 @@ import CalendarFooter from './subs/CalendarFooter.tsx';
 import CalendarHeader from './subs/CalendarHeader.tsx';
 import CalendarMonthGrid from './subs/CalendarMonthGrid.tsx';
 import CalendarMonthNav from './subs/CalendarMonthNav.tsx';
+import DayDetailSidebar from './subs/DayDetailSidebar.tsx';
 
 /** 主日历浮窗 / 桌面日历壳子的可配置项 */
 export interface CalendarViewProps {
@@ -68,6 +69,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         <CalendarMonthGrid />
         <CalendarFooter />
       </div>
+      {model.sidebarDate && (
+        <DayDetailSidebar
+          open={true}
+          selectedDate={model.sidebarDate}
+          onClose={() => model.setSidebarDate(null)}
+        />
+      )}
     </CalendarViewProvider>
   );
 };
